@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsString,
   IsNumber,
@@ -36,3 +37,5 @@ export class CreateProductDto {
   @IsOptional()
   tags?: string[];
 }
+
+export class UpdateProductDto extends PartialType(CreateProductDto) {}

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
-import { CreateProductDto } from './dto/product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { ErrorHelper } from 'src/core/helpers';
 import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from 'src/core/constants';
 import { Order, PaginationDto, PaginationResultDto } from 'src/lib/utils/dto';
@@ -71,7 +71,7 @@ export class ProductService {
 
   async update(
     id: string,
-    updateProductDto: CreateProductDto, // TODO: UpdateProductDto
+    updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     try {
       const updatedProduct = await this.productRepo

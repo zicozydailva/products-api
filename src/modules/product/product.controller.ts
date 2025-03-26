@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { AuthGuard } from 'src/lib/utils/guards';
 import { User as UserDecorator } from 'src/lib/utils/decorators';
 import { IUser } from 'src/core/interfaces';
@@ -61,7 +61,10 @@ export class ProductController {
 
   @UseGuards(AuthGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
     const res = await this.productService.update(id, updateProductDto);
 
     return {
