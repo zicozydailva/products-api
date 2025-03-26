@@ -29,8 +29,16 @@ npm install
 or, if using npm: npm install
 
 4. Environment Setup
-   PORT=
-   MONGO_URI=
+PORT=
+MONGO_URI=
+
+ACCESS_TOKEN_EXPIRES=
+APP_SECRET=
+
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+REDIS_USERNAME=
 
 5. **Running the Application**:
   # development
