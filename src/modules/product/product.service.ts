@@ -14,8 +14,7 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
     try {
-      const product = new this.productRepo(createProductDto);
-      return product.save();
+      return await this.productRepo.create(createProductDto);
     } catch (error) {
       ErrorHelper.BadRequestException(error);
     }
