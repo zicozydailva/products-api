@@ -6,6 +6,7 @@ import { SecretsService } from './global/secrets/service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductModule } from './modules/product/product.module';
+import { SeedModule } from './modules/seed/seed.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ProductModule } from './modules/product/product.module';
     AuthModule,
     UserModule,
     ProductModule,
+    SeedModule,
     MongooseModule.forRootAsync({
       imports: [SecretsModule],
       inject: [SecretsService],
