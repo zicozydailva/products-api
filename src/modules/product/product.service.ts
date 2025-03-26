@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/product.dto';
 import { ErrorHelper } from 'src/core/helpers';
 import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from 'src/core/constants';
+import { Order, PaginationDto, PaginationResultDto } from 'src/lib/utils/dto';
 
 @Injectable()
 export class ProductService {
@@ -27,12 +28,25 @@ export class ProductService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(paginationQuery: PaginationDto) {
+    const { limit, page, order } = paginationQuery;
+    const skip = (page - 1) * limit;
+    const sortOrder = order === Order.DESC ? -1 : 1;
+
     try {
-      return await this.productRepo.find().populate([
-        { path: 'currency', select: CURRENCY_P },
-        { path: 'createdBy', select: USER_P },
-      ]);
+      const products = await this.productRepo
+        .find()
+        .sort({ createdAt: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .populate([
+          { path: 'currency', select: CURRENCY_P },
+          { path: 'createdBy', select: USER_P },
+        ]);
+
+      const count = await this.productRepo.countDocuments();
+
+      return new PaginationResultDto(products, count, { limit, page });
     } catch (error) {
       ErrorHelper.NotFoundException(error);
     }
