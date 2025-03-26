@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Currency } from './currency.schema';
+import { User } from 'src/modules/user/schema/user.entity';
 
 export type ProductDocument = Product & Document;
 
@@ -29,6 +30,9 @@ export class Product {
 
   @Prop([String])
   tags: string[];
+
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  createdBy: User;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -6,5 +6,7 @@ export const INVALID_CODE_FORGOT_PASSWORD =
 export const INVALID_TOKEN = 'Invalid token';
 export const EMAIL_ALREADY_EXISTS = 'Email already exists';
 export const USER_DOESNT_EXIST = 'User Not Found';
-
 export const PRODUCT_NOT_FOUND = 'Product Not Found';
+
+export const CURRENCY_P = 'code label symbol';
+export const USER_P = 'firstName lastName email';

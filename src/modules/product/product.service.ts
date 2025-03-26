@@ -4,7 +4,7 @@ import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/product.dto';
 import { ErrorHelper } from 'src/core/helpers';
-import { PRODUCT_NOT_FOUND } from 'src/core/constants';
+import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from 'src/core/constants';
 
 @Injectable()
 export class ProductService {
@@ -13,9 +13,15 @@ export class ProductService {
     private readonly productRepo: Model<ProductDocument>,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(
+    createProductDto: CreateProductDto,
+    userId: string,
+  ): Promise<Product> {
     try {
-      return await this.productRepo.create(createProductDto);
+      return await this.productRepo.create({
+        createdBy: userId,
+        ...createProductDto,
+      });
     } catch (error) {
       ErrorHelper.BadRequestException(error);
     }
@@ -23,7 +29,10 @@ export class ProductService {
 
   async findAll(): Promise<Product[]> {
     try {
-      return this.productRepo.find().populate('currency').exec();
+      return await this.productRepo.find().populate([
+        { path: 'currency', select: CURRENCY_P },
+        { path: 'createdBy', select: USER_P },
+      ]);
     } catch (error) {
       ErrorHelper.NotFoundException(error);
     }
@@ -31,7 +40,10 @@ export class ProductService {
 
   async findOne(id: string): Promise<Product> {
     try {
-      const product = await this.productRepo.findById(id).populate('currency');
+      const product = await this.productRepo.findById(id).populate([
+        { path: 'currency', select: CURRENCY_P },
+        { path: 'createdBy', select: USER_P },
+      ]);
 
       if (!product) {
         ErrorHelper.NotFoundException(PRODUCT_NOT_FOUND);
@@ -50,7 +62,10 @@ export class ProductService {
     try {
       const updatedProduct = await this.productRepo
         .findByIdAndUpdate(id, updateProductDto, { new: true })
-        .populate('currency');
+        .populate([
+          { path: 'currency', select: CURRENCY_P },
+          { path: 'createdBy', select: USER_P },
+        ]);
 
       if (!updatedProduct) {
         ErrorHelper.NotFoundException(PRODUCT_NOT_FOUND);
