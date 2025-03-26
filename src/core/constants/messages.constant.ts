@@ -7,4 +7,4 @@ export const INVALID_TOKEN = 'Invalid token';
 export const EMAIL_ALREADY_EXISTS = 'Email already exists';
 export const USER_DOESNT_EXIST = 'User Not Found';
 
-export const TASK_NOT_FOUND = 'Task Not Found';
+export const PRODUCT_NOT_FOUND = 'Product Not Found';

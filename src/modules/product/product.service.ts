@@ -4,6 +4,7 @@ import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/product.dto';
 import { ErrorHelper } from 'src/core/helpers';
+import { PRODUCT_NOT_FOUND } from 'src/core/constants';
 
 @Injectable()
 export class ProductsService {
@@ -24,11 +25,34 @@ export class ProductsService {
     const product = await this.productRepo.findById(id).populate('currency');
 
     if (!product) {
-      ErrorHelper.NotFoundException('Product not found');
+      ErrorHelper.NotFoundException(PRODUCT_NOT_FOUND);
     }
 
     return product;
   }
 
-  
+  async update(
+    id: string,
+    updateProductDto: CreateProductDto, // TODO: UpdateProductDto
+  ): Promise<Product> {
+    const updatedProduct = await this.productRepo
+      .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .populate('currency');
+
+    if (!updatedProduct) {
+      ErrorHelper.NotFoundException(PRODUCT_NOT_FOUND);
+    }
+
+    return updatedProduct;
+  }
+
+  async remove(id: string): Promise<Product> {
+    const deletedProduct = await this.productRepo.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      ErrorHelper.NotFoundException(PRODUCT_NOT_FOUND);
+    }
+
+    return deletedProduct;
+  }
 }
