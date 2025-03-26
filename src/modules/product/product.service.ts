@@ -19,4 +19,16 @@ export class ProductsService {
       ErrorHelper.BadRequestException(error);
     }
   }
+
+  async findOne(id: string): Promise<Product> {
+    const product = await this.productRepo.findById(id).populate('currency');
+
+    if (!product) {
+      ErrorHelper.NotFoundException('Product not found');
+    }
+
+    return product;
+  }
+
+  
 }
