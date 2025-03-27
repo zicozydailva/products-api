@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: products-api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: mongodb+srv://zicozydasilva70:Ogbu10ski@cluster0.ik6bf.mongodb.net/
+    depends_on: []
