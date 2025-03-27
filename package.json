@@ -94,12 +94,21 @@
       ".entity.ts",
       "src/helpers",
       "src/main.ts",
-      "src/modules/entities",
-      "src/migrations",
       ".dto.ts",
+      ".pipe.ts",
+      ".utils.ts",
+      ".filter.ts",
+      ".decorator.ts",
+      ".index.ts",
+      ".index.ts",
+      ".interceptor.ts",
       ".validation.ts",
       ".controller.ts",
-      "src/module/seed"
+      ".guard.ts",
+      ".seed.service.ts",
+      "src/modules/seed",
+      "src/global",
+      "src/core"
     ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"

@@ -14,8 +14,10 @@ import { EMAIL_ALREADY_EXISTS } from '../../../core/constants';
 
 const userModelMock = {
   find: jest.fn(),
-  findOne: jest.fn().mockReturnValue({
-    lean: jest.fn().mockResolvedValue(testUser),
+  findOne: jest.fn().mockImplementation((query) => {
+    return query.email === testUser.email
+      ? { lean: jest.fn().mockResolvedValue(testUser) } // Simulates user exists
+      : { lean: jest.fn().mockResolvedValue(null) }; // Simulates user not found
   }),
   create: jest.fn().mockResolvedValue({
     _id: 'user_id',
