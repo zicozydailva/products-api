@@ -9,6 +9,6 @@ import { Currency, CurrencySchema } from '../product/schema/currency.schema';
       { name: Currency.name, schema: CurrencySchema },
     ]),
   ],
-  providers: [SeedService],
+  providers: [SeedService, SeedModule],
 })
 export class SeedModule {}

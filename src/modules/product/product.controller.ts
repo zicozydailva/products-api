@@ -18,10 +18,14 @@ import {
 import { AuthGuard } from 'src/lib/utils/guards';
 import { User as UserDecorator } from 'src/lib/utils/decorators';
 import { IUser } from 'src/core/interfaces';
+import { SeedService } from '../seed/seed.service';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly seedService: SeedService,
+  ) {}
 
   @UseGuards(AuthGuard)
   @Post()
@@ -46,6 +50,17 @@ export class ProductController {
     return {
       data: res,
       message: 'Products Fetched Successfully',
+      success: true,
+    };
+  }
+
+  @Get('/currencies')
+  async fetchCurrencies() {
+    const res = await this.seedService.fetchCurrencies();
+
+    return {
+      data: res,
+      message: 'Currencies Fetched Successfully',
       success: true,
     };
   }
