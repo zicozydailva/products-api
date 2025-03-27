@@ -37,7 +37,7 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const sortOrder = order === Order.DESC ? -1 : 1;
 
-    // Build the query condition dynamically
+    // dynamic query condition
     const queryCondition: any = {};
 
     if (typeof isActive !== 'undefined') {
@@ -52,6 +52,7 @@ export class ProductService {
       queryCondition.$or = [
         { name: { $regex: search, $options: 'i' } }, // Case-insensitive search on product name
         { sku: { $regex: search, $options: 'i' } }, // Case-insensitive search on SKU
+        { tags: { $in: [new RegExp(search, 'i')] } }, // Case-insensitive search in tags array
       ];
     }
 
