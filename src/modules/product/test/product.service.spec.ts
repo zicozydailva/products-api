@@ -3,6 +3,8 @@ import { ProductService } from '../product.service';
 import { mockProductId, testProduct, updatedProduct } from './data';
 import { getModelToken } from '@nestjs/mongoose';
 import { Product } from '../schema/product.entity';
+import { ProductFilterDto } from '../dto/product.dto';
+import { Order, PaginationResultDto } from '../../../lib/utils/dto';
 
 const productModelMock = {
   create: jest.fn().mockResolvedValue(testProduct),
@@ -17,6 +19,18 @@ const productModelMock = {
   findByIdAndDelete: jest.fn().mockResolvedValue(testProduct),
 };
 
+const mockProducts = [testProduct, { ...testProduct, name: 'Another Product' }];
+const totalProducts = mockProducts.length;
+
+const findProductModelMock = {
+  find: jest.fn().mockReturnThis(),
+  sort: jest.fn().mockReturnThis(),
+  skip: jest.fn().mockReturnThis(),
+  limit: jest.fn().mockReturnThis(),
+  populate: jest.fn().mockResolvedValue(mockProducts),
+  countDocuments: jest.fn().mockResolvedValue(totalProducts),
+};
+
 describe('ProductService', () => {
   let productService: ProductService;
 
@@ -28,7 +42,7 @@ describe('ProductService', () => {
         ProductService,
         {
           provide: getModelToken(Product.name),
-          useValue: productModelMock,
+          useValue: { ...productModelMock, ...findProductModelMock },
         },
       ],
     }).compile();
@@ -116,6 +130,87 @@ describe('ProductService', () => {
       productModelMock.findByIdAndDelete.mockResolvedValueOnce(null);
 
       await expect(productService.remove(mockProductId)).rejects.toThrow();
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return paginated products', async () => {
+      const paginationQuery: ProductFilterDto = {
+        limit: 10,
+        page: 1,
+        skip: 1,
+        order: Order.DESC,
+        search: '',
+        isActive: true,
+        category: 'Electronics',
+      };
+
+      const result = await productService.findAll(paginationQuery);
+
+      expect(result).toBeInstanceOf(PaginationResultDto);
+      expect(result.data).toEqual(mockProducts);
+      expect(result.meta.itemCount).toBe(totalProducts);
+      expect(findProductModelMock.find).toHaveBeenCalledWith({
+        isActive: true,
+        category: 'Electronics',
+      });
+      expect(findProductModelMock.countDocuments).toHaveBeenCalledWith({
+        isActive: true,
+        category: 'Electronics',
+      });
+    });
+
+    it('should apply search filters', async () => {
+      const paginationQuery: ProductFilterDto = {
+        limit: 5,
+        page: 1,
+        skip: 1,
+        order: Order.DESC,
+        search: 'wireless',
+      };
+
+      await productService.findAll(paginationQuery);
+
+      expect(findProductModelMock.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          $or: [
+            { name: { $regex: 'wireless', $options: 'i' } },
+            { sku: { $regex: 'wireless', $options: 'i' } },
+            { tags: { $in: [new RegExp('wireless', 'i')] } },
+          ],
+        }),
+      );
+    });
+
+    it('should return empty array if no products match', async () => {
+      findProductModelMock.find.mockReturnValueOnce({
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        populate: jest.fn().mockResolvedValue([]),
+      });
+      findProductModelMock.countDocuments.mockResolvedValueOnce(0);
+
+      const paginationQuery: ProductFilterDto = {
+        limit: 5,
+        page: 1,
+        skip: 1,
+        order: Order.DESC,
+      };
+      const result = await productService.findAll(paginationQuery);
+
+      expect(result.data).toEqual([]);
+      expect(result.meta.itemCount).toBe(0);
+    });
+
+    it('should handle errors and throw an exception', async () => {
+      findProductModelMock.find.mockImplementationOnce(() => {
+        throw new Error('Database error');
+      });
+
+      await expect(
+        productService.findAll({ limit: 5, page: 1, skip: 1 }),
+      ).rejects.toThrow();
     });
   });
 });

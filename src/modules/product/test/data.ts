@@ -1,3 +1,4 @@
+import { Order } from '../../../lib/utils/dto';
 import { CreateProductDto, UpdateProductDto } from '../dto/product.dto';
 
 export const testProduct: CreateProductDto = {
@@ -16,4 +17,13 @@ export const mockProductId = 'product_123';
 export const updatedProduct: UpdateProductDto = {
   name: 'Updated Wireless Headphones',
   price: 89.99,
+};
+
+export const paginationQuery = {
+  limit: 10,
+  page: 1,
+  order: Order.DESC,
+  search: '',
+  isActive: true,
+  category: 'Electronics',
 };
