@@ -1,4 +1,4 @@
-import { CreateProductDto } from '../dto/product.dto';
+import { CreateProductDto, UpdateProductDto } from '../dto/product.dto';
 
 export const testProduct: CreateProductDto = {
   name: 'Wireless Headphones',
@@ -9,4 +9,11 @@ export const testProduct: CreateProductDto = {
   category: 'Electronics',
   isActive: true,
   tags: ['wireless', 'bluetooth', 'audio'],
+};
+
+export const mockProductId = 'product_123';
+
+export const updatedProduct: UpdateProductDto = {
+  name: 'Updated Wireless Headphones',
+  price: 89.99,
 };

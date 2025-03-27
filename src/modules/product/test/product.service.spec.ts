@@ -1,11 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from '../product.service';
-import { testProduct } from './data';
+import { mockProductId, testProduct, updatedProduct } from './data';
 import { getModelToken } from '@nestjs/mongoose';
 import { Product } from '../schema/product.entity';
 
 const productModelMock = {
   create: jest.fn().mockResolvedValue(testProduct),
+  findById: jest.fn().mockReturnValue({
+    populate: jest.fn().mockResolvedValue(testProduct),
+  }),
+  findByIdAndUpdate: jest.fn().mockReturnValue({
+    populate: jest
+      .fn()
+      .mockResolvedValue({ ...testProduct, ...updatedProduct }),
+  }),
+  findByIdAndDelete: jest.fn().mockResolvedValue(testProduct),
 };
 
 describe('ProductService', () => {
@@ -46,6 +55,23 @@ describe('ProductService', () => {
         productService.create(testProduct, 'user_123'),
       ).rejects.toThrow();
       expect(productModelMock.create).toHaveBeenCalled();
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return a product by ID', async () => {
+      const product = await productService.findOne(mockProductId);
+
+      expect(product).toBeDefined();
+      expect(productModelMock.findById).toHaveBeenCalledWith(mockProductId);
+    });
+
+    it('should throw an error if product is not found', async () => {
+      productModelMock.findById.mockReturnValueOnce({
+        populate: jest.fn().mockResolvedValue(null),
+      });
+
+      await expect(productService.findOne(mockProductId)).rejects.toThrow();
     });
   });
 });
