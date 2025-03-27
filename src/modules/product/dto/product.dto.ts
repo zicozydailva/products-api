@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsMongoId,
 } from 'class-validator';
+import { PaginationDto } from 'src/lib/utils/dto';
 
 export class CreateProductDto {
   @IsString()
@@ -39,3 +40,21 @@ export class CreateProductDto {
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
+
+export class ProductFilterDto extends PaginationDto {
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
+  @IsString()
+  @IsOptional()
+  isActive?: boolean;
+}

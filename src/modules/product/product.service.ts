@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
-import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import {
+  CreateProductDto,
+  ProductFilterDto,
+  UpdateProductDto,
+} from './dto/product.dto';
 import { ErrorHelper } from 'src/core/helpers';
 import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from 'src/core/constants';
-import { Order, PaginationDto, PaginationResultDto } from 'src/lib/utils/dto';
+import { Order, PaginationResultDto } from 'src/lib/utils/dto';
 
 @Injectable()
 export class ProductService {
@@ -28,14 +32,32 @@ export class ProductService {
     }
   }
 
-  async findAll(paginationQuery: PaginationDto) {
-    const { limit, page, order } = paginationQuery;
+  async findAll(paginationQuery: ProductFilterDto) {
+    const { limit, page, order, search, isActive, category } = paginationQuery;
     const skip = (page - 1) * limit;
     const sortOrder = order === Order.DESC ? -1 : 1;
 
+    // Build the query condition dynamically
+    const queryCondition: any = {};
+
+    if (typeof isActive !== 'undefined') {
+      queryCondition.isActive = isActive;
+    }
+
+    if (category) {
+      queryCondition.category = category;
+    }
+
+    if (search) {
+      queryCondition.$or = [
+        { name: { $regex: search, $options: 'i' } }, // Case-insensitive search on product name
+        { sku: { $regex: search, $options: 'i' } }, // Case-insensitive search on SKU
+      ];
+    }
+
     try {
       const products = await this.productRepo
-        .find()
+        .find(queryCondition)
         .sort({ createdAt: sortOrder })
         .skip(skip)
         .limit(limit)
@@ -44,7 +66,7 @@ export class ProductService {
           { path: 'createdBy', select: USER_P },
         ]);
 
-      const count = await this.productRepo.countDocuments();
+      const count = await this.productRepo.countDocuments(queryCondition);
 
       return new PaginationResultDto(products, count, { limit, page });
     } catch (error) {

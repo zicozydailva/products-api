@@ -10,11 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import {
+  CreateProductDto,
+  ProductFilterDto,
+  UpdateProductDto,
+} from './dto/product.dto';
 import { AuthGuard } from 'src/lib/utils/guards';
 import { User as UserDecorator } from 'src/lib/utils/decorators';
 import { IUser } from 'src/core/interfaces';
-import { PaginationDto } from 'src/lib/utils/dto';
 
 @Controller('products')
 export class ProductController {
@@ -37,7 +40,7 @@ export class ProductController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async findAll(@Query() paginationQuery: PaginationDto) {
+  async findAll(@Query() paginationQuery: ProductFilterDto) {
     const res = await this.productService.findAll(paginationQuery);
 
     return {
