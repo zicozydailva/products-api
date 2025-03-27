@@ -74,4 +74,48 @@ describe('ProductService', () => {
       await expect(productService.findOne(mockProductId)).rejects.toThrow();
     });
   });
+
+  describe('update', () => {
+    it('should update a product', async () => {
+      const product = await productService.update(
+        mockProductId,
+        updatedProduct,
+      );
+
+      expect(product).toBeDefined();
+      expect(product.name).toBe(updatedProduct.name);
+      expect(productModelMock.findByIdAndUpdate).toHaveBeenCalledWith(
+        mockProductId,
+        updatedProduct,
+        { new: true },
+      );
+    });
+
+    it('should throw an error if product is not found', async () => {
+      productModelMock.findByIdAndUpdate.mockReturnValueOnce({
+        populate: jest.fn().mockResolvedValue(null),
+      });
+
+      await expect(
+        productService.update(mockProductId, updatedProduct),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('remove', () => {
+    it('should delete a product', async () => {
+      const product = await productService.remove(mockProductId);
+
+      expect(product).toBeDefined();
+      expect(productModelMock.findByIdAndDelete).toHaveBeenCalledWith(
+        mockProductId,
+      );
+    });
+
+    it('should throw an error if product is not found', async () => {
+      productModelMock.findByIdAndDelete.mockResolvedValueOnce(null);
+
+      await expect(productService.remove(mockProductId)).rejects.toThrow();
+    });
+  });
 });
