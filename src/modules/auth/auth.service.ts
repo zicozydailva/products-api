@@ -3,14 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../user/schema/user.entity';
 import { Model } from 'mongoose';
 import { CreateUserDto, LoginDto } from '../user/dto/user.dto';
-import { EncryptHelper, ErrorHelper } from 'src/core/helpers';
+import { EncryptHelper, ErrorHelper } from '../../core/helpers';
 import {
   EMAIL_ALREADY_EXISTS,
   INVALID_EMAIL_OR_PASSWORD,
-} from 'src/core/constants';
-import { IUser } from 'src/core/interfaces';
-import { UserSessionService } from 'src/global/user-session/service';
-import { TokenHelper } from 'src/lib/utils/token/token.utils';
+} from '../../core/constants';
+import { IUser } from '../../core/interfaces';
+import { UserSessionService } from '../../global/user-session/service';
+import { TokenHelper } from '../../lib/utils/token/token.utils';
 
 @Injectable()
 export class AuthService {
@@ -52,14 +52,13 @@ export class AuthService {
     }
   }
 
-  private async createUser(payload: CreateUserDto) {
+  async createUser(payload: CreateUserDto) {
     const { email } = payload;
     const emailQuery = {
       email: email.toLowerCase(),
     };
 
     const emailExist = await this.userRepo.findOne(emailQuery);
-
     if (emailExist) {
       ErrorHelper.BadRequestException(EMAIL_ALREADY_EXISTS);
     }
@@ -70,7 +69,7 @@ export class AuthService {
       email: email.toLowerCase(),
     });
 
-    return user.toObject();
+    return user;
   }
 
   private async validateUser(email: string, password: string) {
@@ -78,7 +77,7 @@ export class AuthService {
       email: email.toLowerCase(),
     };
 
-    const user = await this.userRepo.findOne(emailQuery);
+    const user = await this.userRepo.findOne(emailQuery).lean();
 
     if (!user) {
       ErrorHelper.BadRequestException(INVALID_EMAIL_OR_PASSWORD);
@@ -92,7 +91,7 @@ export class AuthService {
       ErrorHelper.BadRequestException(INVALID_EMAIL_OR_PASSWORD);
     }
 
-    return user.toObject();
+    return user;
   }
 
   private async generateUserSession(user: IUser) {

@@ -23,6 +23,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@nestjs-modules/ioredis": "^1.0.1",
     "@nestjs/common": "^10.4.9",
     "@nestjs/config": "^3.0.0",
@@ -36,7 +37,9 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.7",
     "ioredis": "^5.3.1",
+    "ioredis-mock": "^8.9.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb-memory-server": "^8.12.2",
     "otp-generator": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
@@ -80,6 +83,24 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "coveragePathIgnorePatterns": [
+      "node_modules",
+      "test-config",
+      "interfaces",
+      "jestGlobalMocks.ts",
+      ".module.ts",
+      ".mock.ts",
+      ".schema.ts",
+      ".entity.ts",
+      "src/helpers",
+      "src/main.ts",
+      "src/modules/entities",
+      "src/migrations",
+      ".dto.ts",
+      ".validation.ts",
+      ".controller.ts",
+      "src/module/seed"
+    ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

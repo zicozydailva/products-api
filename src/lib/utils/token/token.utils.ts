@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import * as otpGenerator from 'otp-generator';
 
-import { ErrorHelper } from 'src/core/helpers';
-import { IUser } from 'src/core/interfaces';
-import { SecretsService } from 'src/global/secrets/service';
+import { ErrorHelper } from '../../../core/helpers';
+import { IUser } from '../../../core/interfaces';
+import { SecretsService } from '../../../global/secrets/service';
 
 @Injectable()
 export class TokenHelper {

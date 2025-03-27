@@ -7,9 +7,9 @@ import {
   ProductFilterDto,
   UpdateProductDto,
 } from './dto/product.dto';
-import { ErrorHelper } from 'src/core/helpers';
-import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from 'src/core/constants';
-import { Order, PaginationResultDto } from 'src/lib/utils/dto';
+import { ErrorHelper } from '../../core/helpers';
+import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from '../../core/constants';
+import { Order, PaginationResultDto } from '../../lib/utils/dto';
 
 @Injectable()
 export class ProductService {

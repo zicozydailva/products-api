@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/lib/utils/guards';
-import { PaginationDto } from 'src/lib/utils/dto';
+import { AuthGuard } from '../../lib/utils/guards';
+import { PaginationDto } from '../../lib/utils/dto';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

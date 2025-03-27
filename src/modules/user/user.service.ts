@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schema/user.entity';
-import { ErrorHelper } from 'src/core/helpers';
-import { PaginationDto, PaginationResultDto } from 'src/lib/utils/dto';
+import { ErrorHelper } from '../../core/helpers';
+import { PaginationDto, PaginationResultDto } from '../../lib/utils/dto';
 
 @Injectable()
 export class UserService {
