@@ -22,7 +22,7 @@ export class SeedService {
   }
 
   async seedCurrencies() {
-    const currencyCount = await this.currencyRepo.count();
+    const currencyCount = await this.currencyRepo.countDocuments();
     this.logger.log(`currency count is ${currencyCount}`);
     if (currencyCount > 0) return;
 
