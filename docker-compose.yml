@@ -3,12 +3,44 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: products-api
+    container_name: products_api
     restart: always
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - .env  # Load environment variables from .env file
     ports:
       - "3000:3000"
-    env_file:
-      - .env
+    networks:
+      - my_network
+
+  mongo:
+    image: mongo:6
+    container_name: mongo_db
+    restart: always
+    ports:
+      - "27017:27017"
     environment:
-      MONGO_URI_FILE: /run/secrets/mongo_uri
-    depends_on: []
+      - MONGO_INITDB_DATABASE=mydatabase
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - my_network
+
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ""  # Empty password
+    networks:
+      - my_network
+
+volumes:
+  mongo_data:
+
+networks:
+  my_network:
+    driver: bridge
