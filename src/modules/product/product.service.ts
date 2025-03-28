@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
@@ -10,7 +10,8 @@ import {
 import { ErrorHelper } from '../../core/helpers';
 import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from '../../core/constants';
 import { Order, PaginationResultDto } from '../../lib/utils/dto';
-import { Cache } from 'cache-manager';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class ProductService {
@@ -18,7 +19,7 @@ export class ProductService {
   constructor(
     @InjectModel(Product.name)
     private readonly productRepo: Model<ProductDocument>,
-    @Inject('CACHE_MANAGER') private cacheManager: Cache,
+    @InjectRedis() private readonly redisClient: Redis,
   ) {}
 
   async create(
@@ -41,11 +42,10 @@ export class ProductService {
     const sortOrder = order === Order.DESC ? -1 : 1;
 
     const cacheKey = `products_${limit}_${page}_${order}_${search}_${isActive}_${category}`;
-    this.logger.log({ cacheKey });
-    const cachedData = await this.cacheManager.get(cacheKey);
+    const cachedData = await this.redisClient.get(cacheKey);
     if (cachedData) {
       this.logger.log(`✅ Cache hit: Returning cached data`);
-      return cachedData;
+      return JSON.parse(cachedData); // Ensure JSON format
     }
 
     this.logger.log('❌ Cache miss: Fetching from database');
@@ -84,7 +84,7 @@ export class ProductService {
 
       // Store result in cache
       const result = new PaginationResultDto(products, count, { limit, page });
-      await this.cacheManager.set(cacheKey, result, 300); // Cache for 5 minutes
+      await this.redisClient.set(cacheKey, JSON.stringify(result), 'EX', 300); // Cache for 5 minutes
 
       return result;
     } catch (error) {
