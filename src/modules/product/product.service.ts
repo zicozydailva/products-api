@@ -22,10 +22,7 @@ export class ProductService {
     @InjectRedis() private readonly redisClient: Redis,
   ) {}
 
-  async create(
-    createProductDto: CreateProductDto,
-    userId: string,
-  ): Promise<Product> {
+  async create(createProductDto: CreateProductDto, userId): Promise<Product> {
     try {
       return await this.productRepo.create({
         createdBy: userId,

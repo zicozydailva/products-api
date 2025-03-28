@@ -69,7 +69,13 @@ export class AuthService {
       email: email.toLowerCase(),
     });
 
-    return user;
+    return {
+      _id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      password: user.password, // Optional: remove this field before returning for security
+    };
   }
 
   private async validateUser(email: string, password: string) {
