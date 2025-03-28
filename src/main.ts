@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
+import * as compression from 'compression';
 
 import { MainModule } from './main.module';
 import { SecretsService } from './global/secrets/service';
@@ -25,6 +26,7 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Authorization'],
   });
+  app.use(compression());
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));

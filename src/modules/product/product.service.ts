@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from './schema/product.entity';
 import { Model } from 'mongoose';
@@ -10,12 +10,15 @@ import {
 import { ErrorHelper } from '../../core/helpers';
 import { CURRENCY_P, PRODUCT_NOT_FOUND, USER_P } from '../../core/constants';
 import { Order, PaginationResultDto } from '../../lib/utils/dto';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductService {
+  private logger = new Logger(ProductService.name);
   constructor(
     @InjectModel(Product.name)
     private readonly productRepo: Model<ProductDocument>,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
   ) {}
 
   async create(
@@ -37,6 +40,16 @@ export class ProductService {
     const skip = (page - 1) * limit;
     const sortOrder = order === Order.DESC ? -1 : 1;
 
+    const cacheKey = `products_${limit}_${page}_${order}_${search}_${isActive}_${category}`;
+    this.logger.log({ cacheKey });
+    const cachedData = await this.cacheManager.get(cacheKey);
+    if (cachedData) {
+      this.logger.log(`✅ Cache hit: Returning cached data`);
+      return cachedData;
+    }
+
+    this.logger.log('❌ Cache miss: Fetching from database');
+
     // dynamic query condition
     const queryCondition: any = {};
 
@@ -50,9 +63,9 @@ export class ProductService {
 
     if (search) {
       queryCondition.$or = [
-        { name: { $regex: search, $options: 'i' } }, // Case-insensitive search on product name
-        { sku: { $regex: search, $options: 'i' } }, // Case-insensitive search on SKU
-        { tags: { $in: [new RegExp(search, 'i')] } }, // Case-insensitive search in tags array
+        { name: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { tags: { $in: [new RegExp(search, 'i')] } },
       ];
     }
 
@@ -69,7 +82,11 @@ export class ProductService {
 
       const count = await this.productRepo.countDocuments(queryCondition);
 
-      return new PaginationResultDto(products, count, { limit, page });
+      // Store result in cache
+      const result = new PaginationResultDto(products, count, { limit, page });
+      await this.cacheManager.set(cacheKey, result, 300); // Cache for 5 minutes
+
+      return result;
     } catch (error) {
       ErrorHelper.NotFoundException(error);
     }
