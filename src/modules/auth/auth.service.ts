@@ -59,6 +59,7 @@ export class AuthService {
     };
 
     const emailExist = await this.userRepo.findOne(emailQuery);
+
     if (emailExist) {
       ErrorHelper.BadRequestException(EMAIL_ALREADY_EXISTS);
     }
@@ -69,13 +70,7 @@ export class AuthService {
       email: email.toLowerCase(),
     });
 
-    return {
-      _id: user._id.toString(),
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      password: user.password, // Optional: remove this field before returning for security
-    };
+    return user.toObject();
   }
 
   private async validateUser(email: string, password: string) {
@@ -83,7 +78,7 @@ export class AuthService {
       email: email.toLowerCase(),
     };
 
-    const user = await this.userRepo.findOne(emailQuery).lean();
+    const user = await this.userRepo.findOne(emailQuery);
 
     if (!user) {
       ErrorHelper.BadRequestException(INVALID_EMAIL_OR_PASSWORD);
@@ -97,7 +92,7 @@ export class AuthService {
       ErrorHelper.BadRequestException(INVALID_EMAIL_OR_PASSWORD);
     }
 
-    return user;
+    return user.toObject();
   }
 
   private async generateUserSession(user: IUser) {
