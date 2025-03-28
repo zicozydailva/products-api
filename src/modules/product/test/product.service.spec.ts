@@ -6,6 +6,13 @@ import { Product } from '../schema/product.entity';
 import { ProductFilterDto } from '../dto/product.dto';
 import { Order, PaginationResultDto } from '../../../lib/utils/dto';
 
+// Mock Redis client
+const mockRedis = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+};
+
 const productModelMock = {
   create: jest.fn().mockResolvedValue(testProduct),
   findById: jest.fn().mockReturnValue({
@@ -43,6 +50,10 @@ describe('ProductService', () => {
         {
           provide: getModelToken(Product.name),
           useValue: { ...productModelMock, ...findProductModelMock },
+        },
+        {
+          provide: 'default_IORedisModuleConnectionToken',
+          useValue: mockRedis,
         },
       ],
     }).compile();
